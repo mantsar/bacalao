@@ -31,7 +31,7 @@ Bacalao {
 
 		numChannels = numChannels ? 2;
 		clock.permanent = true;
-		MIDIClient.init(verbose: false);
+		// MIDIClient.init(verbose: false);
 
 		Bacalao.prSetupSynthDefs();
 		Bacalao.prSetupEventTypes();
@@ -42,9 +42,9 @@ Bacalao {
 		// take to perform any asynchronous VST operation. Ten seconds is more
 		// than enough in my usage.
 		server = server ? Server.default;
-		server.options.memSize = max(server.options.memSize, 128 * 1024);
-		server.recorder.recBufSize = (server.sampleRate ?? { server.options.sampleRate ? 44100 } * 10).nextPowerOfTwo;
-		server.options.numOutputBusChannels = max(server.options.numOutputBusChannels, numChannels);
+		// server.options.memSize = max(server.options.memSize, 128 * 1024);
+		// server.recorder.recBufSize = (server.sampleRate ?? { server.options.sampleRate ? 44100 } * 10).nextPowerOfTwo;
+		// server.options.numOutputBusChannels = max(server.options.numOutputBusChannels, numChannels);
 
 		Bacalao.config();
 		^super.newCopyArgs(clock, server, verbose ? true, quant, numChannels, (), (), nil).start.prSetupCmdPeriod.prSetupBarClock.push;
@@ -1072,18 +1072,18 @@ Bacalao {
 		}
 	}
 
-	vstPrintInstruments { arg onlyWithPresets = true, extraVstPluginSearchPath = "C:/Program Files/Native Instruments/VSTPlugins 64 bit";
+	vstPrintInstruments { arg onlyWithPresets = true, extraVstPluginSearchPath = "~/.vst3";
 		this.prVstPrint("VST Instruments", _.synth, onlyWithPresets, extraVstPluginSearchPath);
 	}
 
-	vstPrintEffects { arg onlyWithPresets = true, extraVstPluginSearchPath = "C:/Program Files/Native Instruments/VSTPlugins 64 bit";
+	vstPrintEffects { arg onlyWithPresets = true, extraVstPluginSearchPath = "~/.vst3";
 		this.prVstPrint("VST Effects", _.synth.not, onlyWithPresets, extraVstPluginSearchPath);
 	}
 
 	// Add a VST filter effect (needs array index > 0) to modify the NodeProxy
 	// e.g. b.vstFx(\drum -> 10, "Reaktor 6", "goldFinalizer"); { arg in; JPverb.ar(in, 3) }, 0.3);
 	// You can clear fx in a slot with: b.fx(\drum -> 10);
-	vstFx { arg trkNameAndIndex, vstName, programPath, extraVstPluginSearchPath = "C:/Program Files/Native Instruments/VSTPlugins 64 bit", wet=1;
+	vstFx { arg trkNameAndIndex, vstName, programPath, extraVstPluginSearchPath = "~/.vst3", wet=1;
 		var trkName, index;
 		if (Bacalao.prVSTPluginInstalled.not) { ^this };
 
@@ -1147,7 +1147,7 @@ Bacalao {
 		}
 	}
 
-	vstInit { arg trkName, vstName, programPath, bankAndProgram, extraVstPluginSearchPath = "C:/Program Files/Native Instruments/VSTPlugins 64 bit";
+	vstInit { arg trkName, vstName, programPath, bankAndProgram, extraVstPluginSearchPath = "~/.vst3";
 		if (Bacalao.prVSTPluginInstalled.not) { ^this };
 		//programPath = programPath !? { VSTPlugin.prResolvePath(programPath, false).postln };
 		server.waitForBoot{
@@ -1508,7 +1508,7 @@ Bacalao {
 		};
 
 		// We set a 'time' key in our Events, which provides time since playing.
-		// Otherwise, the clock restarts on a given sub-pattern, for example amp"Psine.exprange(8,-0.25,0.1,1)"
+		// Otherwise, the clock restarts on a given sub-pattern, for example amp"Psin.exprange(8,-0.25,0.1,1)"
 		quantStartBeat = patternQuant.nextTimeOnGrid(barClock);
 		case
 		{ vst.notNil and: { role.isNil } } {
@@ -2578,7 +2578,7 @@ PmaskBjork {
 	}
 }
 
-Psine {
+Psin {
 	*new { arg periodBars=1, phase=0, mul=1, add=0, repeats=inf;
 		// We don't use Ptime (except as fallback when a 'time' key isn't there)
 		// so we get elapsed time for the "overall" pattern, not sub-patterns.
@@ -2587,15 +2587,15 @@ Psine {
 	}
 
 	*range { arg lo = -1.0, hi=1.0, periodBars=1, phase=0, repeats=inf;
-		^Psine.new(periodBars, phase, 1, 0, repeats).linlin(-1,1, lo,hi);
+		^Psin.new(periodBars, phase, 1, 0, repeats).linlin(-1,1, lo,hi);
 	}
 
 	*exprange { arg lo = 0.01, hi=1.0, periodBars=1, phase=0, repeats=inf;
-		^Psine.new(periodBars, phase, 1, 0, repeats).linexp(-1,1, lo,hi);
+		^Psin.new(periodBars, phase, 1, 0, repeats).linexp(-1,1, lo,hi);
 	}
 
 	*curverange { arg lo = 0.01, hi=1.0, curve = -4, periodBars=1, phase=0, repeats=inf;
-		^Psine.new(periodBars, phase, 1, 0, repeats).lincurve(-1,1, lo,hi, curve);
+		^Psin.new(periodBars, phase, 1, 0, repeats).lincurve(-1,1, lo,hi, curve);
 	}
 }
 
